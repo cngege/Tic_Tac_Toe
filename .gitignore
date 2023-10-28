@@ -30,4 +30,6 @@
 *.exe
 *.out
 *.app
-/.vs/Tic_Tac_Toe
+/.vs
+
+x64
