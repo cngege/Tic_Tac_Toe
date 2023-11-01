@@ -381,93 +381,120 @@ void AIStep(int* x, int* y) {
 
 int main()
 {
-    resetMap();
-
+    // 外循环 每次结束游戏后循环一次
     while (true)
     {
-        system("cls");
+        resetMap();
         PrintUI();
-        //std::this_thread::sleep_for(std::chrono::seconds(2));
-
-        // 玩家先手
-        std::cout << "输入 1~9：";
-
+        // 本局的第一次输入
+        std::cout << "输入 1~9（ >9 则AI先手）：";
         int input;
         std::cin >> input;
-        if (input < 1 || input > 9)
+        if (input < 1)
         {
             std::cout << "输入不合法 ， 退出。" << std::endl;
             (void)getchar();
             return 0;
         }
-
-        // 解析为xy
-        int x, y;
-
-        soltToxy(input, &x, &y);
-
-        
-        if (getRole(x, y) != Role::Empty)
-        {
-            // 重新输入
-            continue;
-        }
-        else {
-            setRole(x, y, Role::Player);
-
-            if (CheckWom(x, y) == Role::Player)
-            {
-                system("cls");
-                PrintUI();
-
-                std::cout << "你赢了，好了，要不你关了吧" << std::endl;
-                system("pause");
-                resetMap();
-                continue;
-            }
-
-            if (!hasEmptySolt())
-            {
-                system("cls");
-                PrintUI();
-
-                std::cout << "平局..." << std::endl;
-                system("pause");
-                resetMap();
-                continue;
-            }
-
+        else if( input > 9){    // AI 先手
+            // 解析为xy
+            int x, y;
             // AI 下
             AIStep(&x, &y);
-            
             // 落棋
             setRole(x, y, Role::AI);
+            /* 由于是第一步落子，所以不用判断游戏结局 */
+        }
+        else {
+            goto inputed;
+        }
 
-            // 检查AI是否胜利
-            if (CheckWom(x, y) == Role::AI)
+
+        // 内循环 每次玩家落子的时候循环一次
+        while (true)
+        {
+            system("cls");
+            PrintUI();
+            //std::this_thread::sleep_for(std::chrono::seconds(2));
+
+            std::cout << "输入 1~9：";
+
+            std::cin >> input;
+            if (input < 1 || input > 9)
             {
-                system("cls");
-                PrintUI();
+                std::cout << "输入不合法 ， 退出。" << std::endl;
+                (void)getchar();
+                return 0;
+            }
+        inputed:
+            // 解析为xy
+            int x, y;
 
-                std::cout << "你输了， 你还玩什么玩，关了吧" << std::endl;
-                system("pause");
-                resetMap();
+            soltToxy(input, &x, &y);
+
+
+            if (getRole(x, y) != Role::Empty)
+            {
+                // 重新输入
                 continue;
             }
+            else {
+                setRole(x, y, Role::Player);
 
-            if (!hasEmptySolt())
-            {
-                system("cls");
-                PrintUI();
+                if (CheckWom(x, y) == Role::Player)
+                {
+                    system("cls");
+                    PrintUI();
 
-                std::cout << "平局..." << std::endl;
-                system("pause");
-                resetMap();
-                continue;
+                    std::cout << "你赢了，好了，要不你关了吧" << std::endl;
+                    system("pause && cls");
+                    break;
+                }
+
+                if (!hasEmptySolt())
+                {
+                    system("cls");
+                    PrintUI();
+
+                    std::cout << "平局..." << std::endl;
+                    system("pause && cls");
+                    break;
+                }
+
+                // AI 下
+                AIStep(&x, &y);
+
+                // 落棋
+                setRole(x, y, Role::AI);
+
+                // 检查AI是否胜利
+                if (CheckWom(x, y) == Role::AI)
+                {
+                    system("cls");
+                    PrintUI();
+
+                    std::cout << "你输了， 你还玩什么玩，关了吧" << std::endl;
+                    system("pause && cls");
+                    break;
+                }
+
+                if (!hasEmptySolt())
+                {
+                    system("cls");
+                    PrintUI();
+
+                    std::cout << "平局..." << std::endl;
+                    system("pause && cls");
+                    break;
+                }
             }
+
         }
 
     }
+
+
+
 
 }
 
